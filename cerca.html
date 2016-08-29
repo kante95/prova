@@ -1,0 +1,96 @@
+<html>
+<head>
+<style>
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script>
+		function get_data() {
+		var selection = $('form').serialize()
+			
+  var xhttp; 
+  if (selection == "") {
+    return;
+  }
+  xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+    //$("#result").text(xhttp.responseText);
+    $('#records_table tbody:eq(1)').empty();
+    try{
+    var response = $.parseJSON(xhttp.responseText);
+
+		 $.each(response, function(index, element)
+		 {
+		 	$('#records_table tbody:eq(1)').append("<tr> <td>"+ element.id +"</td><td>"+ element.name +"</td><td>"+ element.field +"</td><td>"+ element.retribution +"</td><td>"+ element.period +"</td><td>"+ element.studies[0] +", "+ element.studies[1] +"</td><td><a href=\""+ element.link.link+"\">"+ element.link.label + "</a></td><td>"+ element.description +"</td></tr>");
+         	   
+   		 })
+
+   	}
+   	catch(err)
+   	{
+   		$('#records_table tbody:eq(1)').append("<td colspan=\"8\">"+xhttp.responseText+"</td>");
+   	}
+
+
+    }
+  };
+  xhttp.open("GET", "/get_data?"+selection, true);
+  xhttp.send();
+}
+	</script>
+
+
+</head>
+  <body onload="get_data()">
+  	<a href="/">Home</a>
+	<a href="/cerca">Cerca</a>
+	<a href="/database">Database</a>
+	<form id="form" action="">
+			
+		<label  for="field">Campo</label>		
+		<select id="field" name="field" onchange="get_data()"> 
+			<option value="-1">Tutto</option>
+			<option value="Particelle">Particelle</option>
+			<option value="Varie">Varie</option>
+			<option value="Space Science">Space Science</option>
+			<option value="Plasma">Plasma</option>
+		</select>
+		
+		<label  for="period">Periodo</label>
+		<select id="period" name="period" onchange="get_data()" > 
+			<option value="-1" >Tutto</option>
+			<option value="Estate" >Estate</option>
+			<option value="Tutto l'anno">Tutto l'anno</option>
+
+		</select>
+		<label  for="retribution">Retribuzione</label>
+		<select id="retribution" name="retribution" onchange="get_data()" > 
+			<option value="-1">Tutto</option>
+			<option value="1">Si</option>
+			<option value="0">No</option>
+
+		</select>
+		</form>	
+		
+		<div id="result">
+	<table id=records_table>
+	<tr>
+	<th>Id</th>
+    <th>Nome</th>
+    <th>Campo</th>
+    <th>Retribuzione</th>
+    <th>Periodo</th>
+    <th>Studi</th>
+    <th>Link</th>
+    <th>Descrizione</th>
+	</tr>
+	<tbody>
+	</tbody>
+	</table>
+
+</div>
+  </body>
+</html>
