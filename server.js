@@ -24,7 +24,7 @@ MongoClient.connect(url, function (err, database) {
 	collection = db.collection('fermi');
 })
 
-var server = app.listen(8080, function () {
+var server = app.listen((process.env.PORT || 5000), function () {
 
   var host = server.address().address
   var port = server.address().port
@@ -37,10 +37,10 @@ var server = app.listen(8080, function () {
 app.get('/', function (req, res) {
    res.sendFile( __dirname + "/" + "index.html" );
 })
-app.get('/cerca', function (req, res) {
+app.get('/filtri', function (req, res) {
    res.sendFile( __dirname + "/" + "cerca.html" );
 })
-app.get('/database', function (req, res) {
+app.get('/cerca', function (req, res) {
    res.sendFile( __dirname + "/" + "database.html" );
 })
 app.get('/get_database', function (req, res) {
@@ -52,7 +52,6 @@ app.get('/get_database', function (req, res) {
 
 app.get('/get_data', function (req, res) {
     var query = {};
-    console.log(req.query.retribution);
 	if(req.query.field!=-1 )
 	{
 		query["field"] = req.query.field;
@@ -78,3 +77,25 @@ app.get('/get_data', function (req, res) {
 
   }
 );
+
+
+app.get('/search', function (req, res) {
+    var query1 = {};
+    var query2 = {};
+    query2["name"] = new RegExp(req.query.q, 'i'); 
+    query1["description"]= new RegExp(req.query.q, 'i'); 
+	  console.log(query1,query2)
+    collection.find({$or: [ query1, query2 ]}).toArray(function (err, result) {
+      if (err) {
+        res.end(err);
+      } else if (result.length) {
+        console.log(result)
+        res.send(result);
+      } else {
+        res.end('Nessun risultato trovato con questi criteri');
+      }      
+    });
+
+  }
+);
+

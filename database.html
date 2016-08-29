@@ -1,42 +1,77 @@
 <html>
 <head>
-	<style>
+<style>
 table, th, td {
     border: 1px solid black;
 }
 </style>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	<script>
-		function getDatabase() {		
+		function get_data() {
+      console.log("ciao")
+		var search = $('#search').val()
   var xhttp; 
-  
+  if (search == "") {
+    return;
+  }
   xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (xhttp.readyState == 4 && xhttp.status == 200) {
     //$("#result").text(xhttp.responseText);
-    	var response = $.parseJSON(xhttp.responseText);
-		
+    console.log(xhttp.responseText);
+    $('#records_table tbody:eq(1)').empty();
+    try{
+    var response = $.parseJSON(xhttp.responseText);
+
 		 $.each(response, function(index, element)
 		 {
-		 	$('#records_table').append("<tr> <td>"+ element.id +"</td><td>"+ element.name +"</td><td>"+ element.field +"</td><td>"+ element.retribution +"</td><td>"+ element.period +"</td><td>"+ element.studies[0] +", "+ element.studies[1] +"</td><td><a href=\""+ element.link.link+"\">"+ element.link.label + "</a></td><td>"+ element.description +"</td></tr>");
-         	//console.log(element.id)
+		 	$('#records_table tbody:eq(1)').append("<tr> <td>"+ element.id +"</td><td>"+ element.name +"</td><td>"+ element.field +"</td><td>"+ element.retribution +"</td><td>"+ element.period +"</td><td>"+ element.studies[0] +", "+ element.studies[1] +"</td><td><a href=\""+ element.link.link+"\">"+ element.link.label + "</a></td><td>"+ element.description +"</td></tr>");
          	   
    		 })
-	}
-  };
-  xhttp.open("GET", "/get_database", true);
-  xhttp.send();
-}
-</script>
 
+   	}
+   	catch(err)
+   	{
+   		$('#records_table tbody:eq(1)').append("<td colspan=\"8\">"+xhttp.responseText+"</td>");
+   	}
+
+
+    }
+  };
+  xhttp.open("GET", "/search?q="+search, true);
+  xhttp.send();
+  return false;
+}
+	</script>
 
 
 </head>
-<body onload="getDatabase()">
-<a href="/">Home</a>
-<a href="/cerca">Cerca</a>
-<a href="/database">Database</a>
-<div id="result">
+  <body>
+  	<a href="/">Home</a>
+	<a href="/filtri">Filtri</a>
+	<a href="/cerca">Cerca</a>
+  <script>
+  i = 0;
+  $(document).ready(function(){
+    $("#form").keypress(function(e){
+       if(e.which==13)
+       {
+
+        get_data();
+        return false;
+       }
+       else
+        {return;}
+    });
+});
+</script>
+	<form id="form">
+			<input id ="search" type="text" name="search">
+		<button type="button" onclick="get_data()">Cerca</button>
+ 
+		</form>	
+		
+		<div id="result">
 	<table id=records_table>
 	<tr>
 	<th>Id</th>
@@ -48,9 +83,10 @@ table, th, td {
     <th>Link</th>
     <th>Descrizione</th>
 	</tr>
-
+	<tbody>
+	</tbody>
 	</table>
 
 </div>
-</body>
+  </body>
 </html>
